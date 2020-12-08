@@ -4,7 +4,6 @@ package cn.onekit.x2x.cloud.toutiao_alipay;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.response.AlipaySecurityRiskContentDetectResponse;
 import com.alipay.developer.AlipayMiniSDK;
-import com.alipay.developer.AlipayPaySDK;
 import com.alipay.openapi.entity.alipay_security_risk_content_detect_body;
 import com.aliyun.developer.AliyunSDK;
 import com.aliyuncs.entity.ImageSyncScanRequest_body;
@@ -14,14 +13,13 @@ import com.toutiao.developer.entity.Predict;
 import com.toutiao.developer.entity.v2.*;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 
 public abstract class ToutiaoServer2 implements ToutiaoAPI2 {
 
 
-    private AlipayMiniSDK alipayMiniSDK=new AlipayMiniSDK("https://openapi.alipay.com/gateway.do",AlipayAccount.appId,"",AlipayAccount.fromat,AlipayAccount.charset,AlipayAccount.signType,
-            "","",AlipayAccount.version,"");
+    private AlipayMiniSDK alipayMiniSDK=new AlipayMiniSDK("https://openapi.alipay.com/gateway.do",AlipayAccount.alipay_appId,"",AlipayAccount.alipay_fromat,AlipayAccount.alipay_charset,AlipayAccount.alipay_signType,
+            "","",AlipayAccount.alipay_version,"");
 
     private AliyunSDK aliyunSDK = new AliyunSDK();
 
@@ -68,7 +66,11 @@ public abstract class ToutiaoServer2 implements ToutiaoAPI2 {
             datas.add(data);
             tt_response.setData(datas);
         } catch (AlipayApiException e) {
-            e.printStackTrace();
+            ToutiaoError2 tt_error2 = new ToutiaoError2();
+            tt_error2.setCode(74077);
+            tt_error2.setError_id(e.getErrCode());
+            tt_error2.setMessage(e.getErrMsg());
+            throw tt_error2;
         }
         return tt_response;
     }
@@ -77,13 +79,20 @@ public abstract class ToutiaoServer2 implements ToutiaoAPI2 {
     public tags__image_response tags__image(String tt_X_Token, tags__image_body tt_body) throws ToutiaoError2 {
         tags__image_response tt_response = new tags__image_response();
         ImageSyncScanRequest_body al_body = new ImageSyncScanRequest_body();
-        ArrayList<ImageSyncScanRequest_body.scene> scenes = new ArrayList<>();
+        ArrayList<ImageSyncScanRequest_body.Scene> scenes = new ArrayList<>();
+        scenes.add(ImageSyncScanRequest_body.Scene.porn);
+        scenes.add(ImageSyncScanRequest_body.Scene.qrcode);
+        scenes.add(ImageSyncScanRequest_body.Scene.live);
+        scenes.add(ImageSyncScanRequest_body.Scene.ad);
+        scenes.add(ImageSyncScanRequest_body.Scene.logo);
+        scenes.add(ImageSyncScanRequest_body.Scene.terrorism);
+
         al_body.setScenes(scenes);
         al_body.setBizType(null);
 
-        HashMap<String, ImageSyncScanRequest_body.tasks> al_tasks = new HashMap<>();
+        HashMap<String, ImageSyncScanRequest_body.Task> al_tasks = new HashMap<>();
 
-        ImageSyncScanRequest_body.tasks al_task = new ImageSyncScanRequest_body.tasks();
+        ImageSyncScanRequest_body.Task al_task = new ImageSyncScanRequest_body.Task();
 
         for (tags__image_body.Task tt_task : tt_body.getTasks()) {
             al_task.setUrl(tt_task.getImage());

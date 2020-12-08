@@ -19,11 +19,11 @@ import java.util.UUID;
 public abstract class ToutiaoServer implements ToutiaoAPI {
 
 
-    private AlipayToolSDK alipayToolSDK=new AlipayToolSDK("https://openapi.alipay.com/gateway.do",AlipayAccount.appId,"",AlipayAccount.fromat,AlipayAccount.charset,AlipayAccount.signType,
-            "","",AlipayAccount.version,"");
+    private AlipayToolSDK alipayToolSDK=new AlipayToolSDK("https://openapi.alipay.com/gateway.do",AlipayAccount.alipay_appId,"",AlipayAccount.alipay_fromat,AlipayAccount.alipay_charset,AlipayAccount.alipay_signType,
+            "","",AlipayAccount.alipay_version,"");
 
-    private AlipaySellSDK alipaySellSDK=new AlipaySellSDK("https://openapi.alipay.com/gateway.do",AlipayAccount.appId,"",AlipayAccount.fromat,AlipayAccount.charset,AlipayAccount.signType,
-            "","",AlipayAccount.version,"");
+    private AlipaySellSDK alipaySellSDK=new AlipaySellSDK("https://openapi.alipay.com/gateway.do",AlipayAccount.alipay_appId,"",AlipayAccount.alipay_fromat,AlipayAccount.alipay_charset,AlipayAccount.alipay_signType,
+            "","",AlipayAccount.alipay_version,"");
 
 
 
@@ -73,7 +73,11 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
         try {
             al_response = alipayToolSDK.alipay_system_oauth_token(al_grant_type,tt_code,null);
         } catch (AlipayApiException e) {
-            e.printStackTrace();
+            ToutiaoError tt_error = new ToutiaoError();
+            tt_error.setError(74077);
+            tt_error.setErrcode(Integer.parseInt(e.getErrCode()));
+            tt_error.setErrmsg(e.getErrMsg());
+            throw tt_error;
         }
         //////////
         user_id = al_response.getUserId();
@@ -109,7 +113,11 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
             al_body.setDescribe("二维码描述");
             al_response = alipaySellSDK.alipay_open_app_qrcode_create(al_body);
         } catch (AlipayApiException e) {
-            e.printStackTrace();
+            ToutiaoError tt_error = new ToutiaoError();
+            tt_error.setError(74077);
+            tt_error.setErrcode(Integer.parseInt(e.getErrCode()));
+            tt_error.setErrmsg(e.getErrMsg());
+            throw tt_error;
         }
 
         try {
@@ -149,7 +157,11 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
             tt_response.setErr_no(Integer.parseInt(al_response.getCode()));
             tt_response.setErr_tips(al_response.getMsg());
         } catch (AlipayApiException e) {
-            e.printStackTrace();
+            ToutiaoError tt_error = new ToutiaoError();
+            tt_error.setError(74077);
+            tt_error.setErrcode(Integer.parseInt(e.getErrCode()));
+            tt_error.setErrmsg(e.getErrMsg());
+            throw tt_error;
         }
         return tt_response;
     }
