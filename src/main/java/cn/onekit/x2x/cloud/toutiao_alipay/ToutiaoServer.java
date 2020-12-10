@@ -3,6 +3,7 @@ package cn.onekit.x2x.cloud.toutiao_alipay;
 
 
 import cn.onekit.thekit.AJAX;
+import cn.onekit.thekit.FileDB;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.response.AlipayOpenAppMessageTopicSubscribeResponse;
 import com.alipay.api.response.AlipayOpenAppQrcodeCreateResponse;
@@ -28,15 +29,15 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
 
 
     abstract protected void _code_openid(String tt_code, String tt_openid);
-    abstract protected String _code_openid(String tt_code);
+    abstract protected FileDB.Data _code_openid(String tt_code);
     abstract protected void _openid_sessionkey(String tt_openid, String tt_sessionkey);
-    abstract protected String _openid_sessionkey(String tt_openid);
+    abstract protected FileDB.Data _openid_sessionkey(String tt_openid);
     abstract protected void _token_token(String wx_token,String tt_token);
     abstract protected boolean _token_token(String wx_token);
     //////////////////////////////////////
 
     @Override
-    public apps__token_response apps__token(String tt_appid, String tt_secret, String tt_grant_type) throws ToutiaoError {
+    public apps__token_response apps__token(String tt_appid, String tt_secret, String tt_grant_type)  {
         String token = String.valueOf(UUID.randomUUID());
         apps__token_response tt_response = new apps__token_response();
         tt_response.setAccess_token(token);
@@ -57,19 +58,19 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
         }
         boolean isCode =  tt_code!=null;
         final String code = isCode?tt_code:tt_anonymous_code;
-        String user_id = _code_openid(code);
-        String al_session_key;
-        if(user_id!=null){
-            al_session_key = _openid_sessionkey(user_id);
+        FileDB.Data user_id_data = _code_openid(code);
+        FileDB.Data al_session_key_data = null;
+        if(user_id_data!=null){
+            al_session_key_data = _openid_sessionkey(user_id_data.value);
             apps__jscode2session_response tt_response = new apps__jscode2session_response();
-            tt_response.setAnonymous_openid(user_id);
-            tt_response.setOpenid(user_id);
-            tt_response.setSession_key(al_session_key);
+            tt_response.setAnonymous_openid(user_id_data.value);
+            tt_response.setOpenid(user_id_data.value);
+            tt_response.setSession_key(al_session_key_data.value);
             return tt_response;
         }
         ///////////////////////////////////////////////////
         final String al_grant_type = "authorization_code";
-        AlipaySystemOauthTokenResponse al_response = null;
+        AlipaySystemOauthTokenResponse al_response ;
         try {
             al_response = alipayToolSDK.alipay_system_oauth_token(al_grant_type,tt_code,null);
         } catch (AlipayApiException e) {
@@ -80,16 +81,17 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
             throw tt_error;
         }
         //////////
-        user_id = al_response.getUserId();
-        al_session_key = al_response.getAccessToken();
+        assert false;
+        user_id_data.value = al_response.getUserId();
+        al_session_key_data.value = al_response.getAccessToken();
         ///////////////
-        _code_openid(code,user_id);
-        _openid_sessionkey(user_id,al_session_key);
+        _code_openid(code,user_id_data.value);
+        _openid_sessionkey(user_id_data.value,al_session_key_data.value);
         ////////////
         apps__jscode2session_response tt_response = new apps__jscode2session_response();
-        tt_response.setAnonymous_openid(user_id);
-        tt_response.setOpenid(user_id);
-        tt_response.setSession_key(al_session_key);
+        tt_response.setAnonymous_openid(user_id_data.value);
+        tt_response.setOpenid(user_id_data.value);
+        tt_response.setSession_key(al_session_key_data.value);
         return tt_response;
     }
 
@@ -105,7 +107,7 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
 
     @Override
     public byte[] apps__qrcode(apps__qrcode_body tt_body) throws ToutiaoError {
-        AlipayOpenAppQrcodeCreateResponse al_response = null;
+        AlipayOpenAppQrcodeCreateResponse al_response ;
         try {
             alipay_open_app_qrcode_create_body al_body = new alipay_open_app_qrcode_create_body();
             al_body.setUrl_param(tt_body.getPath());
@@ -121,6 +123,7 @@ public abstract class ToutiaoServer implements ToutiaoAPI {
         }
 
         try {
+            //noinspection ConstantConditions
             return AJAX.download(al_response.getQrCodeUrl(),"get",null) ;
         } catch (Exception e) {
             return null;

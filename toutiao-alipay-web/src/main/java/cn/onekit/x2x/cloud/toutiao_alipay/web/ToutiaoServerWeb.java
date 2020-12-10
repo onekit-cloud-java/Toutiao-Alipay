@@ -1,7 +1,7 @@
 package cn.onekit.x2x.cloud.toutiao_alipay.web;
 
 
-import cn.onekit.thekit.DB;
+import cn.onekit.thekit.FileDB;
 import cn.onekit.thekit.JSON;
 import cn.onekit.x2x.cloud.toutiao_alipay.ToutiaoServer;
 import com.toutiao.developer.entity.*;
@@ -19,32 +19,32 @@ public class ToutiaoServerWeb {
             _toutiaoServer = new ToutiaoServer() {
                 @Override
                 protected void _code_openid(String tt_code, String tt_openid) {
-                    DB.set("[toutiao-alipay] code_openid",tt_code,tt_openid);
+                    FileDB.set("[toutiao-alipay] code_openid",tt_code,tt_openid);
                 }
 
                 @Override
-                protected String _code_openid(String tt_code) {
-                    return DB.get("[toutiao-alipay] code_openid",tt_code);
+                protected FileDB.Data _code_openid(String tt_code) {
+                    return FileDB.get("[toutiao-alipay] code_openid",tt_code);
                 }
 
                 @Override
                 protected void _openid_sessionkey(String tt_openid, String tt_sessionkey) {
-                    DB.set("[toutiao-alipay] openid_sessionkey",tt_openid,tt_sessionkey);
+                    FileDB.set("[toutiao-alipay] openid_sessionkey",tt_openid,tt_sessionkey);
                 }
 
                 @Override
-                protected String _openid_sessionkey(String tt_openid) {
-                    return DB.get("[toutiao-alipay] openid_sessionkey",tt_openid);
+                protected FileDB.Data _openid_sessionkey(String tt_openid) {
+                    return FileDB.get("[toutiao-alipay] openid_sessionkey",tt_openid);
                 }
 
                 @Override
                 protected void _token_token(String wx_token, String tt_token) {
-                    DB.set("[toutiao-alipay] token_token",wx_token,tt_token);
+                    FileDB.set("[toutiao-alipay] token_token",wx_token,tt_token);
                 }
 
                 @Override
                 protected boolean _token_token(String wx_token) {
-                    return Boolean.parseBoolean(DB.get("[toutiao-alipay] token_token",wx_token));
+                    return Boolean.parseBoolean(String.valueOf(FileDB.get("[toutiao-alipay] token_token",wx_token)));
                 }
             };
         }
@@ -60,9 +60,7 @@ public class ToutiaoServerWeb {
     )  {
         try {
             return JSON.object2string(toutiaoServer().apps__token(appid, secret, grant_type));
-        } catch (ToutiaoError toutiaoError) {
-            return JSON.object2string(toutiaoError);
-        }catch (Exception error){
+        } catch (Exception error){
             ToutiaoError toutiaoError = new ToutiaoError();
             toutiaoError.setError(500);
             toutiaoError.setErrcode(500);

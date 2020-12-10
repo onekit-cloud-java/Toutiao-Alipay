@@ -24,12 +24,7 @@ public abstract class ToutiaoServer2 implements ToutiaoAPI2 {
     private AliyunSDK aliyunSDK = new AliyunSDK();
 
 
-    abstract protected void _code_openid(String tt_code, String tt_openid);
-    abstract protected String _code_openid(String tt_code);
-    abstract protected void _openid_sessionkey(String tt_openid, String tt_sessionkey);
-    abstract protected String _openid_sessionkey(String tt_openid);
-    abstract protected void _token_token(String wx_token,String tt_token);
-    abstract protected boolean _token_token(String wx_token);
+
 
     @Override
     public tags__text__antidirt_response tags__text__antidirt(String tt_X_Token, tags__text__antidirt_body tt_body) throws ToutiaoError2 {
@@ -76,7 +71,7 @@ public abstract class ToutiaoServer2 implements ToutiaoAPI2 {
     }
 
     @Override
-    public tags__image_response tags__image(String tt_X_Token, tags__image_body tt_body) throws ToutiaoError2 {
+    public tags__image_response tags__image(String tt_X_Token, tags__image_body tt_body)  {
         tags__image_response tt_response = new tags__image_response();
         ImageSyncScanRequest_body al_body = new ImageSyncScanRequest_body();
         ArrayList<ImageSyncScanRequest_body.Scene> scenes = new ArrayList<>();
@@ -90,6 +85,7 @@ public abstract class ToutiaoServer2 implements ToutiaoAPI2 {
         al_body.setScenes(scenes);
         al_body.setBizType(null);
 
+        //noinspection MismatchedQueryAndUpdateOfCollection
         HashMap<String, ImageSyncScanRequest_body.Task> al_tasks = new HashMap<>();
 
         ImageSyncScanRequest_body.Task al_task = new ImageSyncScanRequest_body.Task();

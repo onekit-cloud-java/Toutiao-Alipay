@@ -16,13 +16,21 @@ public class AlipayAccount implements ApplicationContextAware {
     static String alipay_version;
     static String alipay_fromat;
     static String alipay_charset;
+    @SuppressWarnings("WeakerAccess")
     static String alipay_secretKey;
+    @SuppressWarnings("WeakerAccess")
     static String alipay_privateKey;
+    @SuppressWarnings("WeakerAccess")
     static String alipay_notifyUrl;
+    @SuppressWarnings("WeakerAccess")
     static String alipay_shopId;
+    @SuppressWarnings("WeakerAccess")
     static String alipay_domain;
+    @SuppressWarnings("WeakerAccess")
     static String alipay_partnerId;
+    @SuppressWarnings("WeakerAccess")
     static String alipay_pay_notify;
+    @SuppressWarnings("WeakerAccess")
     static String alipay_refund_notify;
 
 
@@ -51,7 +59,8 @@ public class AlipayAccount implements ApplicationContextAware {
     	String path = System.getProperty("user.home")+"\\AlipayApp\\alipay\\";
     	File file = new File(path);
     	if(!file.exists()) {
-    		file.mkdir();
+            //noinspection ResultOfMethodCallIgnored
+            file.mkdir();
     	}
     }
     
